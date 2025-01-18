@@ -1,5 +1,7 @@
 屎
 
+基本一点错误处理也没做
+
 就连了个api
 
 GET 方法 /content/AIGC/{mood},得到 text 和 imgUrl
