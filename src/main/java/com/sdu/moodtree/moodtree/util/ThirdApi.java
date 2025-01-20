@@ -4,14 +4,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sdu.moodtree.moodtree.entity.Response;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.EnableScheduling;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+
+import java.util.concurrent.TimeUnit;
+
 
 @Component
+@EnableScheduling
 public class ThirdApi
 {
 	private static final String chatglmURL = "https://chatglm.cn/chatglm/assistant-api/v1";
@@ -21,31 +25,31 @@ public class ThirdApi
 	private static final KeyAndSecret moodTherapyKeyAndSecret = new KeyAndSecret ( "7236fd914267180e" , "6dfcf6ba8e3ebb2524fe7168b4a9ad96" );
 	private static final String moodTherapyApiId = "6789d124edd4a13c4571b2d6";//?lang=zh  ??
 	private static String moodTherapyToken;
+	private static Long moodTherapyTokenExpireTime=0L; //
 	
-	
-	private static void refreshMoodTherapyToken ()
+	@Async
+	@Scheduled(fixedRate = 24*1000*60*60)
+	public static void refreshMoodTherapyToken ()
 	{
-		ChatglmResponse response = chatglmWebClient.post ().uri ( "/get_token" )
+		if(moodTherapyTokenExpireTime- System.currentTimeMillis ()/1000>TimeUnit.MINUTES.toSeconds ( 1 )) return;
+		System.out.println ("start refresh mood therapy token");
+		chatglmWebClient.post ().uri ( "/get_token" )
 				.bodyValue ( moodTherapyKeyAndSecret ).retrieve ().bodyToMono ( ChatglmResponse.class )
-				.subscribeOn ( Schedulers.boundedElastic () )
-				.block ();
-		if ( response == null ) throw new RuntimeException ( "null !" );
-		if ( response.getStatus () == 1001 ) throw new RuntimeException ( "api_key is banned !" );
-		if ( response.getStatus () == 1002 ) throw new RuntimeException ( "api_key or api_secret is invalid !" );
-		moodTherapyToken = ( ( ChatglmTokenResult ) response.getResult () ).getToken ();
+				.subscribe(response->{
+					if ( response == null ) throw new RuntimeException ( "get null when refresh mood therapy token" );
+					if ( response.getStatus () == 1001 ) throw new RuntimeException ( "api_key is banned !" );
+					if ( response.getStatus () == 1002 ) throw new RuntimeException ( "api_key or api_secret is invalid !" );
+					moodTherapyToken = ( ( ChatglmTokenResult ) response.getResult () ).getToken ();
+					moodTherapyTokenExpireTime = ( ( ChatglmTokenResult ) response.getResult () ).getTokenExpires ();
+					System.out.println ( "refresh mood therapy token success " );
+				});
 	}
 
 	public static Mono < Response > getMoodTherapy ( String prompt )
 	{
 		if ( moodTherapyToken == null )//or expired
 		{
-			Mono.fromCallable ( () ->
-					{
-						refreshMoodTherapyToken ();
-						return null;
-					} )
-					.subscribeOn ( Schedulers.boundedElastic () )
-					.block ();
+			refreshMoodTherapyToken ();
 		}
 		ChatglmRequest request = new ChatglmRequest ( moodTherapyApiId , prompt );
 		MoodTherapyResult moodTherapyResult = new MoodTherapyResult ();
@@ -175,8 +179,8 @@ class ChatglmTokenResult
 {
 	@JsonProperty ( "access_token" )
 	String token;
-	@JsonProperty ( "expires_in" )
-	Integer expiresIn;
+	@JsonProperty ( "token_expires" )
+		Long tokenExpires;
 	
 	public String getToken ()
 	{
@@ -188,14 +192,14 @@ class ChatglmTokenResult
 		this.token = token;
 	}
 	
-	public Integer getExpiresIn ()
+	public Long getTokenExpires ()
 	{
-		return expiresIn;
+		return tokenExpires;
 	}
 	
-	public void setExpiresIn ( Integer expiresIn )
+	public void setTokenExpires ( Long tokenExpires )
 	{
-		this.expiresIn = expiresIn;
+		this.tokenExpires = tokenExpires;
 	}
 }
 
