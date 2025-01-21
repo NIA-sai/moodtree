@@ -14,3 +14,6 @@ GET 方法 /content/AIGC/{mood},得到 text 和 imgUrl
 
 Supreme-Demon-Dragon：1月21日，在原有项目文件之间新加了一个文件夹“moodtree”，里面是我重做的另一个版本：没有用WebClient，有异常信息汇报，所有返回类型都为Result类，方便前端使用、调试。
 但是测试的时候还有一点问题，虽然没有报错，但是只能得到data=null。我正在改。
+
+
+mol 无上魔龙 佬👆
