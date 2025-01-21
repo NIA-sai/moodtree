@@ -15,8 +15,18 @@ public class Result
     public Object getData() {
         return data;
     }
-
-    public static Result success(Object data) {
+    
+    public int getCode ()
+    {
+        return code;
+    }
+    
+    public String getMessage ()
+    {
+        return message;
+    }
+    
+    public static Result success( Object data) {
         return new Result(100,"success",data);
     }
 

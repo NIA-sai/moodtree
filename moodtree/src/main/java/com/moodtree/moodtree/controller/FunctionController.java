@@ -23,6 +23,7 @@ public class FunctionController
 
     @PostMapping("/integratedAnswer")
     public Result integratedAnswer(@RequestParam("mood") String mood) {
+        System.out.println ("test!");
         return functionService.integratedAnswer(mood);
     }
 }
