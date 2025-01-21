@@ -10,6 +10,7 @@ GET 方法 /content/AIGC/{mood},得到 text 和 imgUrl
 
 才开机或者token才过期的几次请求可能因为异步的原因出错，虽然稍微等一下就好了，但是我也觉得不该用 webclient 力 😳
 
-
-
 于是在学长的指点下选择定时检查，提前一分钟刷新token
+
+Supreme-Demon-Dragon：1月21日，在原有项目文件之间新加了一个文件夹“moodtree”，里面是我重做的另一个版本：没有用WebClient，有异常信息汇报，所有返回类型都为Result类，方便前端使用、调试。
+但是测试的时候还有一点问题，虽然没有报错，但是只能得到data=null。我正在改。
