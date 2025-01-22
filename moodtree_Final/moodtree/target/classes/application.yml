@@ -1,0 +1,10 @@
+spring:
+  application:
+    name: moodtree
+
+chatglm:
+  api-key: 7236fd914267180e
+  api-secret: 6dfcf6ba8e3ebb2524fe7168b4a9ad96
+
+server:
+  port: 8080
