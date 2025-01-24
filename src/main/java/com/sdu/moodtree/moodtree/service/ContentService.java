@@ -1,16 +1,31 @@
 package com.sdu.moodtree.moodtree.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sdu.moodtree.moodtree.entity.Response;
 import com.sdu.moodtree.moodtree.util.ThirdApi;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
-import reactor.core.scheduler.Schedulers;
+
+import java.util.List;
 
 @Service
 public class ContentService
 {
-	public Mono <Response> aiGenerate ( String prompt )
+	public Mono < Response > aiGenerate ( String prompt )
 	{
 		return ThirdApi.getMoodTherapy ( prompt );
+	}
+	
+	public Mono < Response > aiAnalysis ( List < Object > datas ) throws JsonProcessingException
+	{
+		StringBuilder prompt = new StringBuilder ();
+		ObjectMapper objectMapper = new ObjectMapper ();
+		for ( Object data : datas )
+		{
+			prompt.append ( objectMapper.writeValueAsString ( data ) );
+		}
+		System.out.println (prompt);
+		return ThirdApi.getMoodAnalysis ( prompt.toString () );
 	}
 }

@@ -20,3 +20,7 @@ mol 无上魔龙 佬👆
 Supreme-Demon-Dragon：1月22日，完善了我写的moodtree的所有功能。没有任何bug，返回结果清晰，可以使用。文件在moodtree_Final中
 
 remol 无上魔龙 佬👆
+
+
+
+1.24: 添加了 POST 方法 /content/AIGC, “分析天气和心情” ，先内容随便，满足json格式就行，待移动✌测试
