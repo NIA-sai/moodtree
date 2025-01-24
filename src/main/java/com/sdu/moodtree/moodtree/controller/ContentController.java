@@ -23,7 +23,7 @@ public class ContentController
 	}
 	
 	@PostMapping ( "/AIGC" )
-	public Mono < Response > aiAnalysis ( @RequestBody List < Object > data ) throws JsonProcessingException
+	public Mono < Response > aiAnalysis ( @RequestBody List < Object > data )
 	{
 		return contentService.aiAnalysis ( data );
 	}
