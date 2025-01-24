@@ -3,6 +3,8 @@ package com.sdu.moodtree.moodtree.util;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.sdu.moodtree.moodtree.entity.Response;
+import jakarta.annotation.PostConstruct;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.EnableScheduling;
@@ -18,15 +20,34 @@ import java.util.concurrent.TimeUnit;
 @EnableScheduling
 public class ThirdApi
 {
-	private static final String chatglmURL = "https://chatglm.cn/chatglm/assistant-api/v1";
-	private static final WebClient chatglmWebClient = WebClient.create ( chatglmURL );
+	private static KeyAndSecret moodTherapyKeyAndSecret;
 	
-	
-	private static final KeyAndSecret moodTherapyKeyAndSecret = new KeyAndSecret ( "7236fd914267180e" , "6dfcf6ba8e3ebb2524fe7168b4a9ad96" );
-	private static final String moodTherapyApiId = "6789d124edd4a13c4571b2d6";//?lang=zh  ??
+	private static String moodTherapyApiId;//?lang=zh  ??
 	private static String moodTherapyToken;
 	private static Long moodTherapyTokenExpireTime = 0L; //
-	private static final String moodAnalysisApiId = "6791a39c2db09f54cb8333a9";//?lang=zh  ??
+	private static String moodAnalysisApiId;
+	private static WebClient chatglmWebClient;
+	
+	@Value ( "${third_api.chatglm.url}" )
+	private String chatglmURLInit;
+	@Value ( "${third_api.chatglm.key}" )
+	private String chatglmKeyInit;
+	@Value ( "${third_api.chatglm.secret}" )
+	private String chatglmSecretInit;
+	@Value ( "${third_api.chatglm.mood_therapy_api_id}" )
+	private String moodTherapyApiIdInit;
+	@Value ( "${third_api.chatglm.mood_analysis_api_id}" )
+	private String moodAnalysisApiIdInit;
+	
+	@PostConstruct
+	public void init ()
+	{
+		chatglmWebClient = WebClient.create ( chatglmURLInit );
+		moodTherapyKeyAndSecret = new KeyAndSecret ( chatglmKeyInit , chatglmSecretInit );
+		moodTherapyApiId = moodTherapyApiIdInit;
+		moodAnalysisApiId = moodAnalysisApiIdInit;
+	}
+	
 	
 	@Async
 	@Scheduled ( fixedRate = 24*1000*60*60 )

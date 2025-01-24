@@ -17,15 +17,18 @@ public class ContentService
 		return ThirdApi.getMoodTherapy ( prompt );
 	}
 	
-	public Mono < Response > aiAnalysis ( List < Object > datas ) throws JsonProcessingException
-	{
-		StringBuilder prompt = new StringBuilder ();
-		ObjectMapper objectMapper = new ObjectMapper ();
-		for ( Object data : datas )
+	public Mono < Response > aiAnalysis ( List < Object > datas )
+	{try
 		{
-			prompt.append ( objectMapper.writeValueAsString ( data ) );
-		}
-		System.out.println (prompt);
-		return ThirdApi.getMoodAnalysis ( prompt.toString () );
+			StringBuilder prompt = new StringBuilder ();
+			ObjectMapper objectMapper = new ObjectMapper ();
+			for ( Object data : datas )
+				prompt.append ( objectMapper.writeValueAsString ( data ) );
+			return ThirdApi.getMoodAnalysis ( prompt.toString () );
+		}catch ( JsonProcessingException e )
+	{
+		e.printStackTrace ();
+		return Mono.just ( new Response ( 500, "额，看来偷懒不行啊", null ) );
+	}
 	}
 }

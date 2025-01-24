@@ -1,0 +1,5 @@
+spring:
+  application:
+    name: moodtree
+server:
+  port: 8866
